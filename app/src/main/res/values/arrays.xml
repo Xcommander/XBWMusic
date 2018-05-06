@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="sequence_img">
+        <item>@drawable/ic_order</item>
+        <item>@drawable/ic_cycle_one</item>
+        <item>@drawable/ic_cycle_all</item>
+        <item>@drawable/ic_random</item>
+    </array>
+    <array name="sequence_selected_img">
+        <item>@drawable/ic_order_selected</item>
+        <item>@drawable/ic_cycle_one_selected</item>
+        <item>@drawable/ic_cycle_all_selected</item>
+        <item>@drawable/ic_random_select</item>
+    </array>
+    <array name="sequence_name">
+        <item>@string/order</item>
+        <item>@string/cycle_one</item>
+        <item>@string/cycle_all</item>
+        <item>@string/random</item>
+    </array>
+</resources>
