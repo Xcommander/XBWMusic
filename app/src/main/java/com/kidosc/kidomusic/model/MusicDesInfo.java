@@ -4,17 +4,50 @@ package com.kidosc.kidomusic.model;
  * Created by jason.xu on 2018/5/4.
  */
 public class MusicDesInfo {
-    private long id; // 歌曲ID 3
-    private String title; // 歌曲名称 0
-    private String album; // 专辑 7
-    private long albumId;//专辑ID 6
-    private String displayName; //显示名称 4
-    private String artist; // 歌手名称 2
-    private long duration; // 歌曲时长 1
-    private long size; // 歌曲大小 8
-    private String url; // 歌曲路径 5
-    private String lrcTitle; // 歌词名称
-    private String lrcSize; // 歌词大小
+    /**
+     * 歌曲ID
+     */
+    private long id;
+    /**
+     * 歌曲名称
+     */
+    private String title;
+    /**
+     * 专辑
+     */
+    private String album;
+    /**
+     * 专辑ID
+     */
+    private long albumId;
+    /**
+     * 显示名称
+     */
+    private String displayName;
+    /**
+     * 歌手名称
+     */
+    private String artist;
+    /**
+     * 歌曲时长
+     */
+    private long duration;
+    /**
+     * 歌曲大小
+     */
+    private long size;
+    /**
+     * 歌曲路径
+     */
+    private String url;
+    /**
+     * 歌词名称
+     */
+    private String lrcTitle;
+    /**
+     * 歌词大小
+     */
+    private String lrcSize;
 
     public MusicDesInfo() {
         super();

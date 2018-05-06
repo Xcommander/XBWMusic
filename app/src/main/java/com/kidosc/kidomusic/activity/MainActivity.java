@@ -7,13 +7,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.kidosc.kidomusic.R;
 import com.kidosc.kidomusic.adapter.MusicListAdapter;
@@ -23,9 +21,6 @@ import com.kidosc.kidomusic.util.Constant;
 import com.kidosc.kidomusic.util.HttpUtil;
 import com.kidosc.kidomusic.util.MusicUtil;
 import com.kidosc.kidomusic.widget.DashlineItemDivider;
-import com.kidosc.kidomusic.gson.MusicInfo;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +53,7 @@ public class MainActivity extends Activity {
 
 
     /**
-     * 测试用例
+     * 测试用例,从网站上获取音乐列表
      */
     public void testData() {
         HttpUtil.sendOkHttpRequest(Constant.ALL_MUSIC_URL, new Callback() {
@@ -120,31 +115,6 @@ public class MainActivity extends Activity {
         });
     }
 
-    /**
-     * 测试数据,手动扫描固定目录
-     */
-    public void scanMusicDir() {
-        File dir = new File(Constant.MUSIC_DIR);
-        File[] files = dir.listFiles();
-        if (files == null) {
-            Log.e("xulinchao", "scanMusicDir: 111");
-            return;
-        }
-        Log.e("xulinchao", "scanMusicDir: 2");
-        for (int i = 0; i < files.length; i++) {
-            if (!files[i].isDirectory()) {
-                Log.e("xulinchao", "scanMusicDir: 3");
-                String name = files[i].getName();
-                if (name.trim().toLowerCase().endsWith(".mp3")) {
-                    Log.e("xulinchao", "scanMusicDir: " + name);
-
-                }
-            }
-        }
-
-
-    }
-
     public List<MusicDesInfo> getMuiscInfos(Context context) {
 
         Cursor cursor = context.getContentResolver().query(
@@ -153,26 +123,34 @@ public class MainActivity extends Activity {
         List<MusicDesInfo> musicDesInfos = new ArrayList<MusicDesInfo>();
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToNext();
+            // 音乐id
             long id = cursor.getLong(cursor
-                    .getColumnIndex(MediaStore.Audio.Media._ID)); // 音乐id
+                    .getColumnIndex(MediaStore.Audio.Media._ID));
+            // 音乐标题
             String title = cursor.getString((cursor
-                    .getColumnIndex(MediaStore.Audio.Media.TITLE))); // 音乐标题
+                    .getColumnIndex(MediaStore.Audio.Media.TITLE)));
+            // 艺术家
             String artist = cursor.getString(cursor
-                    .getColumnIndex(MediaStore.Audio.Media.ARTIST)); // 艺术家
+                    .getColumnIndex(MediaStore.Audio.Media.ARTIST));
+            // 专辑
             String album = cursor.getString(cursor
-                    .getColumnIndex(MediaStore.Audio.Media.ALBUM)); // 专辑
+                    .getColumnIndex(MediaStore.Audio.Media.ALBUM));
             String displayName = cursor.getString(cursor
                     .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
             long albumId = cursor.getInt(cursor
                     .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+            // 时长
             long duration = cursor.getLong(cursor
-                    .getColumnIndex(MediaStore.Audio.Media.DURATION)); // 时长
+                    .getColumnIndex(MediaStore.Audio.Media.DURATION));
+            // 文件大小
             long size = cursor.getLong(cursor
-                    .getColumnIndex(MediaStore.Audio.Media.SIZE)); // 文件大小
+                    .getColumnIndex(MediaStore.Audio.Media.SIZE));
+            // 文件路径
             String url = cursor.getString(cursor
-                    .getColumnIndex(MediaStore.Audio.Media.DATA)); // 文件路径
+                    .getColumnIndex(MediaStore.Audio.Media.DATA));
+            // 是否为音乐
             int isMusic = cursor.getInt(cursor
-                    .getColumnIndex(MediaStore.Audio.Media.IS_MUSIC)); // 是否为音乐
+                    .getColumnIndex(MediaStore.Audio.Media.IS_MUSIC));
             if (isMusic != 0) {
                 // 只把音乐添加到集合当中
                 Log.e("xulinchao", "getMuiscInfos: " + url);
@@ -206,5 +184,9 @@ public class MainActivity extends Activity {
             }
         }
     }
+    /**
+     * 1.设置监听广播，这样就可以知道是否有音乐的加入，从而刷新列表
+     * 2.当下载Ok的时候，通知系统去扫描指定位置，将音乐加入media相关存储
+     */
 
 }

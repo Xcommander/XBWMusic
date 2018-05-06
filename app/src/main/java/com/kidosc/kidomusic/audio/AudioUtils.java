@@ -120,5 +120,6 @@ public class AudioUtils {
         void onStateChanged (AudioPlayerConst.PlayerState state, int position, boolean isPlaying);
         void onComplete ();
         void onError (int extra);
+        void onPosition(int position);
     }
 }

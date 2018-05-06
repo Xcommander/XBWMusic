@@ -73,8 +73,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
 //                    holder.itemView.setBackgroundColor(mContext.getColor(R.color.music_item_bg));
                     //跳转到播放界面
                     Intent intent=new Intent(mContext,MusicPlayActivity.class);
-                    intent.putExtra("size",mMusicList.size());
-                    intent.putExtra("position",position+1);
+                    intent.putExtra("position",position);
                     mContext.startActivity(intent);
 //                    holder.itemView.setBackgroundColor(mContext.getColor(android.R.color.transparent));
 

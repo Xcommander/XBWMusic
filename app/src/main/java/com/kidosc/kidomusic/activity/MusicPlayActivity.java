@@ -41,7 +41,7 @@ public class MusicPlayActivity extends Activity {
      */
     private MyPopWindow mVolumePopWindow;
     /**
-     * 播放进度条
+     * 界面的UI控件
      */
     private SeekBar mPlaySeekBar;
 
@@ -55,17 +55,26 @@ public class MusicPlayActivity extends Activity {
     private Button mPlayButton;
 
     private int mMusicPosition;
-    private  MusicDesInfo musicDesInfo;
+    private MusicDesInfo musicDesInfo;
+
+    private int mMusicTotalLen;
+    private int mMusicPlayedLen;
+
+    private boolean mIsActive = false;
+
+
+    /**
+     * 监听当前音乐的状态
+     */
     private AudioUtils.OnAudioListener audioListener = new AudioUtils.OnAudioListener() {
         @Override
         public void onStateChanged(AudioPlayerConst.PlayerState state, int position, final boolean isPlaying) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    refreshView(isPlaying);
+                    refreshPlayStateButton(isPlaying);
                 }
             });
-
         }
 
         @Override
@@ -78,20 +87,33 @@ public class MusicPlayActivity extends Activity {
         public void onError(int extra) {
 
         }
-    };
-    public void refreshView(boolean isPlaying){
-        if(isPlaying){
-            mPlayButton.setBackgroundResource(R.drawable.btn_stop);
 
-        }else{
-            mPlayButton.setBackgroundResource(R.drawable.btn_play);
+        @Override
+        public void onPosition(int position) {
+
         }
-        mGenre.setText(musicDesInfo.getAlbum());
-        mSinger.setText(musicDesInfo.getArtist());
-        mMusicName.setText(musicDesInfo.getTitle());
-        mDuration.setText(MusicUtil.formaTime(musicDesInfo.getDuration()));
+    };
 
-    }
+    /**
+     * 监听进度条拖动
+     */
+    private SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            mDurationPlayed.setText(MusicUtil.formatTime(progress));
+
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            AudioUtils.getInstance(getApplication()).getPlayer(AudioUtils.AudioType.MEDIA).seek(seekBar.getProgress());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,30 +127,23 @@ public class MusicPlayActivity extends Activity {
         mMusicName = findViewById(R.id.music_name);
         mDuration = findViewById(R.id.music_duration);
         mDurationPlayed = findViewById(R.id.music_duration_played);
-        mPlayButton=findViewById(R.id.btn_play);
+        mPlayButton = findViewById(R.id.btn_play);
         mSequencePopWindow = new MyPopWindow(this, Constant.POP_WINDOW_SEQUENCE);
         mVolumePopWindow = new MyPopWindow(this, Constant.POP_WINDOW_VOLUME);
-        int len = getIntent().getIntExtra("size", 0);
-        int pos = getIntent().getIntExtra("position", 0);
-        mMusicPosition = pos-1;
-        musicDesInfo = Constant.ALL_MUSIC_LIST.get(pos - 1);
-        mProgress.setText(pos + "/" + len);
-        mGenre.setText(musicDesInfo.getAlbum());
-        mSinger.setText(musicDesInfo.getArtist());
-        mMusicName.setText(musicDesInfo.getTitle());
-        mDuration.setText(MusicUtil.formaTime(musicDesInfo.getDuration()));
+        mMusicPosition = getIntent().getIntExtra("position", 0);
+        musicDesInfo = Constant.ALL_MUSIC_LIST.get(mMusicPosition);
+        mPlaySeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
         AudioUtils.getInstance(getApplication()).setOnAudioListener(audioListener);
-        MusicUtil.handleThread(new Runnable() {
-            @Override
-            public void run() {
-                playMusic(musicDesInfo.getUrl());
-            }
-        });
+        playMusic(musicDesInfo.getUrl());
+        mIsActive = true;
+        //在service中不断的去更新主界面
 
     }
 
     /**
      * 处理点击事件
+     *
+     * @param view
      */
     public void MusicClick(View view) {
         switch (view.getId()) {
@@ -148,8 +163,6 @@ public class MusicPlayActivity extends Activity {
                         AudioUtils.getInstance(getApplication()).getPlayer(AudioUtils.AudioType.MEDIA).playOrPause();
                     }
                 });
-
-
             default:
                 break;
 
@@ -160,10 +173,40 @@ public class MusicPlayActivity extends Activity {
     }
 
     /**
+     * 当音乐状态发生改变时，播放的button
+     *
+     * @param isPlaying
+     */
+
+    public void refreshPlayStateButton(boolean isPlaying) {
+        if (isPlaying) {
+            mPlayButton.setBackgroundResource(R.drawable.btn_stop);
+
+        } else {
+            mPlayButton.setBackgroundResource(R.drawable.btn_play);
+        }
+
+    }
+
+    /**
+     * 初始化播放的控件
+     */
+    public void initPlayView() {
+        mGenre.setText(musicDesInfo.getAlbum());
+        mSinger.setText(musicDesInfo.getArtist());
+        mMusicName.setText(musicDesInfo.getTitle());
+        mDurationPlayed.setText("00:00");
+        mDuration.setText(MusicUtil.formatTime(musicDesInfo.getDuration()));
+        mProgress.setText(mMusicPosition + 1 + "/" + Constant.ALL_MUSIC_LIST.size());
+        mPlaySeekBar.setProgress(1000);
+        mPlaySeekBar.setMax((int) musicDesInfo.getDuration());
+    }
+
+    /**
      * 播放下一首
      */
     public void playNextSong() {
-        if (mMusicPosition <Constant.ALL_MUSIC_LIST.size()-1) {
+        if (mMusicPosition < Constant.ALL_MUSIC_LIST.size() - 1) {
             mMusicPosition = mMusicPosition + 1;
         } else {
             mMusicPosition = 0;
@@ -171,7 +214,7 @@ public class MusicPlayActivity extends Activity {
         if (AudioUtils.getInstance(getApplication()).getPlayer(AudioUtils.AudioType.MEDIA) == null) {
             return;
         }
-        musicDesInfo=Constant.ALL_MUSIC_LIST.get(mMusicPosition);
+        musicDesInfo = Constant.ALL_MUSIC_LIST.get(mMusicPosition);
         playMusic(musicDesInfo.getUrl());
     }
 
@@ -182,12 +225,12 @@ public class MusicPlayActivity extends Activity {
         if (mMusicPosition > 0) {
             mMusicPosition = mMusicPosition - 1;
         } else {
-            mMusicPosition = Constant.ALL_MUSIC_LIST.size()-1;
+            mMusicPosition = Constant.ALL_MUSIC_LIST.size() - 1;
         }
         if (AudioUtils.getInstance(getApplication()).getPlayer(AudioUtils.AudioType.MEDIA) == null) {
             return;
         }
-        musicDesInfo=Constant.ALL_MUSIC_LIST.get(mMusicPosition);
+        musicDesInfo = Constant.ALL_MUSIC_LIST.get(mMusicPosition);
         playMusic(musicDesInfo.getUrl());
     }
 
@@ -195,6 +238,7 @@ public class MusicPlayActivity extends Activity {
      * 播放音乐
      */
     public void playMusic(final String url) {
+        initPlayView();
         MusicUtil.handleThread(new Runnable() {
             @Override
             public void run() {
@@ -225,4 +269,9 @@ public class MusicPlayActivity extends Activity {
         return true;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mIsActive = false;
+    }
 }

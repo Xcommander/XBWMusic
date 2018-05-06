@@ -1,19 +1,14 @@
 package com.kidosc.kidomusic.util;
 
 
-import android.content.Context;
-import android.database.Cursor;
-import android.provider.MediaStore;
+
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.kidosc.kidomusic.gson.MusicResponse;
-import com.kidosc.kidomusic.model.MusicDesInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -52,10 +47,17 @@ public class MusicUtil {
                 new LinkedBlockingQueue<Runnable>(1024), Executors.defaultThreadFactory(), new ThreadPoolExecutor.AbortPolicy());
         singleThreadPool.execute(runnable);
         singleThreadPool.shutdown();
+        Log.e("xulinchao1", "handleThread: ");
 
     }
 
-    public static String formaTime(long time) {
+    /**
+     * 将音乐中的时间转化成标准格式，例如 03:20
+     * @param time
+     * @return
+     */
+
+    public static String formatTime(long time) {
         String min = time / (1000 * 60) + "";
         String sec = time % (1000 * 60) + "";
         if (min.length() < 2) {
