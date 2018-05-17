@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kidosc.kidomusic">
+    package="com.kidosc.kidomusic"
+    android:sharedUserId="android.uid.system">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:name=".activity.MyApplication"
@@ -22,12 +24,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MusicPlayActivity" />
+        <activity android:name=".activity.MusicPlayActivity"
+            android:launchMode="singleTop"/>
 
         <service
             android:name=".audio.MediaPlayerService"
             android:enabled="true"
             android:exported="true" />
+        <service
+            android:name=".download.DownloadService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".receiver.MusicReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.kidosc.xbw_download"></action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

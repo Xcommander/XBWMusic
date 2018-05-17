@@ -26,7 +26,7 @@ public class AudioUtils {
     private static String TAG = "AudioUtils";
 
     private static AudioUtils mInstance;
-    private Application mApp;
+    private WeakReference<Application> mApp;
     private boolean mIsServiceConnection=false;
 
     public static AudioUtils getInstance (Application application) {
@@ -40,11 +40,12 @@ public class AudioUtils {
         switch (type) {
             case MEDIA:
                 while (mMediaPlayer==null){
-                    //等待初始化OK
+                    //等待初始化OK,这个仅仅做延时用
+                    Log.e(TAG, "getPlayer: wait ");
                 }
                 return mMediaPlayer;
             case MPD:
-                return null;//TODO
+                return null;
             default:
                 return null;
         }
@@ -56,7 +57,7 @@ public class AudioUtils {
 
 
     private AudioUtils(Application application) {
-        mApp = application;
+        mApp = new WeakReference<>(application);
         initPlayers();
     }
 
@@ -71,7 +72,7 @@ public class AudioUtils {
                 //发送广播
                 Intent intent = new Intent();
                 intent.setAction("com.kidosc.music.register.listener");
-                mApp.sendBroadcast(intent);
+                mApp.get().sendBroadcast(intent);
             }
             mIsServiceConnection=true;
             Log.i(TAG,"aaaaaamMediaPlayerCallback==null:"+(mMediaPlayerCallback==null));
@@ -91,20 +92,21 @@ public class AudioUtils {
     }
 
     private void initPlayers () {
-        if(mApp==null){
+        if(mApp.get()==null){
             Log.e("xulinchao", "initPlayers: null");
         }else{
             Log.e("xulinchao", "initPlayers: not null" );
         }
-        Intent intent = new Intent(mApp, MediaPlayerService.class);
-        mApp.startService(intent);
-        mApp.bindService(intent,conn, Context.BIND_AUTO_CREATE);
+        Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
+        mApp.get().startService(intent);
+        mApp.get().bindService(intent,conn, Context.BIND_AUTO_CREATE);
     }
 
     public void release () {
-        Intent intent = new Intent(mApp, MediaPlayerService.class);
-        mApp.stopService(intent);
-        mApp.unbindService(conn);
+        Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
+        mApp.get().stopService(intent);
+        mApp.get().unbindService(conn);
+        mApp.clear();
         mApp = null;
         mInstance = null;
     }
@@ -117,9 +119,29 @@ public class AudioUtils {
     }
 
     public interface OnAudioListener {
+        /**
+         *音乐状态发生变化，回调该接口
+         * @param state
+         * @param position
+         * @param isPlaying
+         */
         void onStateChanged (AudioPlayerConst.PlayerState state, int position, boolean isPlaying);
+
+        /**
+         * 当本首音乐播放完成之后，回调该接口
+         */
         void onComplete ();
+
+        /**
+         * 当播放发生错误的时候，进行回调
+         * @param extra
+         */
         void onError (int extra);
-        void onPosition(int position);
+
+        /**
+         * 更新当前music播放的进度,周期是100ms
+         * @param position
+         */
+        void onPosition(final int position);
     }
 }

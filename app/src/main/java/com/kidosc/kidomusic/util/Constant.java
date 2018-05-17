@@ -1,11 +1,11 @@
 package com.kidosc.kidomusic.util;
 
-import android.os.Environment;
+
+
 
 import com.kidosc.kidomusic.model.MusicDesInfo;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jason.xu on 2018/5/2.
@@ -30,9 +30,9 @@ public class Constant {
      */
     public static final String REQUEST_SUCCESS="1";
     /**
-     * 在线播放的URL
+     * 下载的URL
      */
-    public static final String MUSIC_ONLINE_URL="http://main.study-watch.net:8080/data";
+    public static final String MUSIC_ONLINE_URL="http://main.study-watch.net:8080/data/";
 
     /**
      * download task下载的状态
@@ -49,13 +49,58 @@ public class Constant {
     /**
      * 存放音乐的路径
      */
-    public static final String MUSIC_DIR= "/storage/emulated/0/zhx_watch";
+    public static final String MUSIC_DIR= "/storage/emulated/0/zhx_watch/music";
+
 
     /**
-     * 音乐列表
+     * 音乐列表，暂且用静态变量存储
      */
-    public static List<MusicDesInfo> ALL_MUSIC_LIST=new ArrayList<>();
+    public static ArrayList<MusicDesInfo> ALL_MUSIC_LIST=new ArrayList<>();
 
+    /**
+     * 音量上键，下键
+     */
+
+    public static final String VOULME_UP="volume_up";
+    public static final String VOULME_DOWN="volume_down";
+
+    /**
+     * 音乐播放序列
+     */
+    public static final int TYPE_ORDER=0;
+    public static final int TYPE_CYCLE = 1;
+    public static final int TYPE_CYCLE_ALL = 2;
+    public static final int TYPE_RANDOM= 3;
+
+    /**
+     * 播放序列的标志位,默认是顺序播放
+     */
+    public static int TYPE_MUSIC_PLAY_FLAG=0;
+
+    /**
+     * 上一首，下一首
+     */
+    public static final String MUSIC_NEXT="next";
+    public static final String MUSIC_BACK="back";
+
+    /**
+     * music下载广播，下载成功的广播
+     */
+    public static final String ACTION_DOWNLOAD="com.kidosc.xbw_download";
+    public static final String ACTION_DOWNLOAD_SUCCESS="com.kidosc.xbw_done";
+
+    /**
+     * 更新主界面广播
+     */
+    public static final String ACTION_UPDATE_LIST="com.kidosc.kidomusic.update_list";
+
+    /**
+     * sharedPreferences相关
+     */
+    public static final  String SP_NAME_NETWORT_FAILED="network";
+    public static final  String SP_NAME_RESOURCE_FAILED="resource";
+    public static final  String KEY_NETWORT_FAILED="network";
+    public static final  String KEY_RESOURCE_FAILED="resource";
 
 
 }

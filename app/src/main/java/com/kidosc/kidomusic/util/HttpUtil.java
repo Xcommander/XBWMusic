@@ -20,4 +20,7 @@ public class HttpUtil {
         okHttpClient.newCall(request).enqueue(callback);
 
     }
+
+
+
 }

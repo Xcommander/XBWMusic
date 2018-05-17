@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="music_title">#FFFFFF</color>
     <color name="music_item_bg">#70C8DE</color>
+    <color name="sequence_selected">#2D5F77</color>
 </resources>

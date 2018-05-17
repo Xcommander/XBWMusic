@@ -1,10 +1,12 @@
 package com.kidosc.kidomusic.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kidosc.kidomusic.R;
+import com.kidosc.kidomusic.util.Constant;
 
 
 /**
@@ -19,9 +22,11 @@ import com.kidosc.kidomusic.R;
  */
 public class SequenceSelectAdapter extends RecyclerView.Adapter<SequenceSelectAdapter.SequenceHolder> {
     private Context mContext;
+    private AdapterOnClickListener mAdapterOnClickListener;
 
-    public SequenceSelectAdapter(Context context) {
+    public SequenceSelectAdapter(Context context,AdapterOnClickListener adapterOnClickListener) {
         this.mContext = context;
+        this.mAdapterOnClickListener=adapterOnClickListener;
     }
 
     @NonNull
@@ -33,12 +38,35 @@ public class SequenceSelectAdapter extends RecyclerView.Adapter<SequenceSelectAd
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SequenceHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SequenceHolder holder, final int position) {
+        Drawable drawable;
+        String name;
         //先调试这么做，到了UI弄完之后，在考虑有没有点击
-        Drawable drawable = mContext.getResources().obtainTypedArray(R.array.sequence_img).getDrawable(position);
-        String name = mContext.getResources().getStringArray(R.array.sequence_name)[position];
-        holder.imageView.setImageDrawable(drawable);
-        holder.textView.setText(name);
+        if(Constant.TYPE_MUSIC_PLAY_FLAG==position){
+            drawable = mContext.getResources().obtainTypedArray(R.array.sequence_selected_img).getDrawable(position);
+            name = mContext.getResources().getStringArray(R.array.sequence_name)[position];
+            holder.imageView.setImageDrawable(drawable);
+            holder.textView.setText(name);
+            holder.textView.setTextColor(Color.WHITE);
+            holder.itemView.setBackgroundColor(mContext.getColor(R.color.sequence_selected));
+        }else{
+            drawable = mContext.getResources().obtainTypedArray(R.array.sequence_img).getDrawable(position);
+            name = mContext.getResources().getStringArray(R.array.sequence_name)[position];
+            holder.imageView.setImageDrawable(drawable);
+            holder.textView.setText(name);
+            holder.textView.setTextColor(Color.parseColor("#809db4"));
+
+        }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Constant.TYPE_MUSIC_PLAY_FLAG=position;
+                mAdapterOnClickListener.onItemOnClick();
+                Log.e("xulinchao", "onClick: "+position );
+
+            }
+        });
+
     }
 
 

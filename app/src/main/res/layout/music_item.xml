@@ -16,7 +16,7 @@
             android:layout_width="58px"
             android:layout_height="56px"
             android:layout_marginLeft="10px"
-            android:layout_marginTop="17px"
+            android:layout_marginTop="13px"
             android:scaleType="fitCenter" />
 
         <TextView

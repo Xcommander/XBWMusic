@@ -12,7 +12,7 @@
         android:layout_marginTop="17px"
         android:layout_width="174px"
         android:layout_height="52px"
-        android:src="@drawable/ic_vol_0"/>
+        />
 
     <!--音量调节按钮-->
     <RelativeLayout
@@ -25,7 +25,7 @@
             android:layout_width="38px"
             android:layout_height="38px"
             android:src="@drawable/btn_vol_sub"
-            android:onClick="MusicClick"/>
+            android:onClick="musicClick"/>
 
         <TextView
             android:id="@+id/vol_name"
@@ -42,7 +42,7 @@
             android:layout_height="38px"
             android:layout_toRightOf="@id/vol_name"
             android:src="@drawable/btn_vol_add"
-            android:onClick="MusicClick"/>
+            android:onClick="musicClick"/>
 
     </RelativeLayout>
 

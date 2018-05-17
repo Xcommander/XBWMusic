@@ -54,10 +54,7 @@ public class MusicDesInfo {
 
     }
 
-    public MusicDesInfo(long id, String title, String album, long albumId,
-                        String displayName, String artist, long duration, long size,
-                        String url, String lrcTitle, String lrcSize) {
-        super();
+    public MusicDesInfo(long id, String title, String album, long albumId, String displayName, String artist, long duration, long size, String url, String lrcTitle, String lrcSize) {
         this.id = id;
         this.title = title;
         this.album = album;
@@ -71,28 +68,28 @@ public class MusicDesInfo {
         this.lrcSize = lrcSize;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public long getId() {
         return id;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setAlbum(String album) {
-        this.album = album;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getAlbum() {
         return album;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
     }
 
     public long getAlbumId() {
@@ -103,59 +100,59 @@ public class MusicDesInfo {
         this.albumId = albumId;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public String getDisplayName() {
         return displayName;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getArtist() {
         return artist;
     }
 
-    public void setDuration(long duration) {
-        this.duration = duration;
+    public void setArtist(String artist) {
+        this.artist = artist;
     }
 
     public long getDuration() {
         return duration;
     }
 
-    public void setSize(long size) {
-        this.size = size;
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
     public long getSize() {
         return size;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setSize(long size) {
+        this.size = size;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setLrcTitle(String lrcTitle) {
-        this.lrcTitle = lrcTitle;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getLrcTitle() {
         return lrcTitle;
     }
 
-    public void setLrcSize(String lrcSize) {
-        this.lrcSize = lrcSize;
+    public void setLrcTitle(String lrcTitle) {
+        this.lrcTitle = lrcTitle;
     }
 
     public String getLrcSize() {
         return lrcSize;
+    }
+
+    public void setLrcSize(String lrcSize) {
+        this.lrcSize = lrcSize;
     }
 }

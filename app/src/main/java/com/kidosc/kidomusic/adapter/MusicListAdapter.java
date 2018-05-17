@@ -14,8 +14,11 @@ import android.widget.TextView;
 
 import com.kidosc.kidomusic.R;
 import com.kidosc.kidomusic.activity.MusicPlayActivity;
+import com.kidosc.kidomusic.activity.MyApplication;
+import com.kidosc.kidomusic.audio.AudioUtils;
 import com.kidosc.kidomusic.gson.MusicInfo;
 import com.kidosc.kidomusic.model.MusicDesInfo;
+import com.kidosc.kidomusic.util.MusicUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -49,7 +52,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
         }
     }
 
-    public MusicListAdapter(Context context, ArrayList<MusicDesInfo> list ) {
+    public MusicListAdapter(Context context, ArrayList<MusicDesInfo> list) {
         this.mContext = context;
         this.mMusicList = list;
     }
@@ -67,30 +70,22 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
     public void onBindViewHolder(@NonNull final MusicHolder holder, final int position) {
         holder.textView.setText(mMusicList.get(position).getTitle());
         holder.imageView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.music_icon));
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-//                    holder.itemView.setBackgroundColor(mContext.getColor(R.color.music_item_bg));
-                    //跳转到播放界面
-                    Intent intent=new Intent(mContext,MusicPlayActivity.class);
-                    intent.putExtra("position",position);
-                    mContext.startActivity(intent);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //跳转到播放界面
+                Intent intent = new Intent(mContext, MusicPlayActivity.class);
+                intent.putExtra("position", position);
+                mContext.startActivity(intent);
 //                    holder.itemView.setBackgroundColor(mContext.getColor(android.R.color.transparent));
 
-                }
-            });
+            }
+        });
     }
 
 
     @Override
     public int getItemCount() {
         return mMusicList.size();
-    }
-
-    /**
-     * 预留的监听接口，用于回调，不一定用的上
-     */
-    public interface OnItemClickListener {
-        void onClick(int position);
     }
 }
