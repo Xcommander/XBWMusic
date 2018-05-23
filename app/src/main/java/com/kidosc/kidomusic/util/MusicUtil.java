@@ -226,7 +226,7 @@ public class MusicUtil {
     public static List<MusicDesInfo> getMuiscInfos() {
         Cursor cursor = MyApplication.getApplication().getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, MediaStore.MediaColumns.DATA + " like ?", new String[]{Constant.MUSIC_DIR + "%"},
-                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                MediaStore.Audio.Media._ID);
         List<MusicDesInfo> musicDesInfos = new ArrayList<MusicDesInfo>();
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToNext();
@@ -258,6 +258,7 @@ public class MusicUtil {
             // 是否为音乐
             int isMusic = cursor.getInt(cursor
                     .getColumnIndex(MediaStore.Audio.Media.IS_MUSIC));
+            Log.e("xulinchao22", "getMuiscInfos: _id = "+id );
             if (isMusic != 0) {
                 // 只把音乐添加到集合当中
                 MusicDesInfo musicDesInfo = new MusicDesInfo();

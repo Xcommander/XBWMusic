@@ -1,15 +1,16 @@
 package com.kidosc.kidomusic.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.kidosc.kidomusic.R;
 import com.kidosc.kidomusic.adapter.MusicListAdapter;
@@ -19,15 +20,18 @@ import com.kidosc.kidomusic.model.DownloadModel;
 import com.kidosc.kidomusic.util.Constant;
 import com.kidosc.kidomusic.util.MusicUtil;
 import com.kidosc.kidomusic.widget.DashlineItemDivider;
+import com.kidosc.kidomusic.widget.MyRecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
-    private RecyclerView mMusicListView;
+    private MyRecyclerView mMusicListView;
     private RecyclerView.LayoutManager mManager;
     private MusicListAdapter musicListAdapter;
+    private ProgressDialog mProgressDialog;
+    private TextView mEmptyView;
 
 
     /**
@@ -36,12 +40,13 @@ public class MainActivity extends Activity {
     private BroadcastReceiver mUpdateListReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.e("xulinchao22", "update: onReceive ");
             MusicUtil.updateList();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (musicListAdapter != null) {
-                        musicListAdapter.notifyDataSetChanged();
+                        musicListAdapter.updateData(Constant.ALL_MUSIC_LIST);
                     }
                 }
             });
@@ -54,13 +59,13 @@ public class MainActivity extends Activity {
     private DownloadUpdate mDownloadUpdate = new DownloadUpdate() {
         @Override
         public void update() {
-            Log.e("xulinchao", "update: MainActivity ");
+            Log.e("xulinchao22", "update: MainActivity ");
             MusicUtil.updateList();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (musicListAdapter != null) {
-                        musicListAdapter.notifyDataSetChanged();
+                        musicListAdapter.updateData(Constant.ALL_MUSIC_LIST);
                     }
                 }
             });
@@ -86,7 +91,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
-
+        mEmptyView = findViewById(R.id.empty_tv);
         mMusicListView = findViewById(R.id.music_list);
         mManager = new LinearLayoutManager(this);
         musicListAdapter = new MusicListAdapter(this, Constant.ALL_MUSIC_LIST);
@@ -94,6 +99,9 @@ public class MainActivity extends Activity {
         mMusicListView.setLayoutManager(mManager);
         //添加分割线
         mMusicListView.addItemDecoration(new DashlineItemDivider());
+        mMusicListView.setItemAnimator(null);
+
+        mMusicListView.setEmptyView(mEmptyView);
 
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constant.ACTION_UPDATE_LIST);
@@ -107,6 +115,7 @@ public class MainActivity extends Activity {
      * 加载音乐列表
      */
     public void loadMusicList() {
+        showProgressDialog("歌曲", "努力加载歌曲哦..");
         MusicUtil.handleThread(new Runnable() {
             @Override
             public void run() {
@@ -114,11 +123,35 @@ public class MainActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        musicListAdapter.notifyDataSetChanged();
+                        musicListAdapter.updateData(Constant.ALL_MUSIC_LIST);
+                        hideProgressDialog();
                     }
                 });
             }
         });
+    }
+
+    /**
+     * 这个是加载弹框，临时方案，后续再优化样式问题,过时方法以后再去解决
+     *
+     * @param title
+     * @param message
+     */
+    public void showProgressDialog(String title, String message) {
+        if (mProgressDialog == null) {
+            mProgressDialog = ProgressDialog.show(MainActivity.this, title, message, true, false);
+        } else {
+            mProgressDialog.setTitle(title);
+            mProgressDialog.setMessage(message);
+        }
+        mProgressDialog.show();
+
+    }
+
+    public void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
     }
 
     /**
@@ -155,10 +188,15 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (MyApplication.getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA) != null) {
-            MyApplication.getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).stop();
-        }
-
+        Log.e("xulinchao", "onBackPressed: ");
+        MusicUtil.handleThread(new Runnable() {
+            @Override
+            public void run() {
+                if (MyApplication.getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA) != null) {
+                    MyApplication.getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).stop();
+                }
+            }
+        });
     }
 
     @Override

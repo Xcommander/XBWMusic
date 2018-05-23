@@ -32,7 +32,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
     /**
      * mMusicList:存储music
      */
-    private ArrayList<MusicDesInfo> mMusicList;
+    private ArrayList<MusicDesInfo> mMusicList=new ArrayList<>();
 
 
     private Context mContext;
@@ -54,7 +54,24 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
 
     public MusicListAdapter(Context context, ArrayList<MusicDesInfo> list) {
         this.mContext = context;
-        this.mMusicList = list;
+        this.mMusicList.addAll(list);
+    }
+
+    /**
+     * 更新数据源，防止报错
+     *
+     * @param list
+     */
+    public void updateData(ArrayList<MusicDesInfo> list) {
+        Log.e("xulinchao22", "updateData: " + list.size());
+        if(mMusicList!=null){
+            int oldSize=mMusicList.size();
+            mMusicList.clear();
+            notifyItemRangeRemoved(0,oldSize);
+            mMusicList.addAll(list);
+            notifyItemRangeInserted(0,mMusicList.size());
+
+        }
     }
 
 

@@ -16,12 +16,22 @@
         android:textColor="@color/music_title"
         android:textSize="29px" />
 
-    <android.support.v7.widget.RecyclerView
+    <com.kidosc.kidomusic.widget.MyRecyclerView
         android:id="@+id/music_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="5px"
         android:background="@android:color/transparent"
         android:paddingLeft="5px"
-        android:paddingRight="5px"
-        android:layout_marginBottom="5px"/>
+        android:paddingRight="5px" />
+
+    <TextView
+        android:id="@+id/empty_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:text="媒体库中没有音乐"
+        android:visibility="gone"
+        android:layout_marginTop="60dp"
+        />
 </LinearLayout>

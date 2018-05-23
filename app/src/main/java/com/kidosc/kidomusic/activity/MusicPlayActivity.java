@@ -79,6 +79,8 @@ public class MusicPlayActivity extends Activity {
         @Override
         public void onComplete() {
             playNextSong(true);
+
+
         }
 
         @Override
@@ -277,9 +279,10 @@ public class MusicPlayActivity extends Activity {
                 /**
                  * 顺序播放:(1)自动播放(2)单击
                  */
-
+                Log.e("xulinchao11", "selectMusic: isAuto = " + isAuto + " mMusicPosition = " + mMusicPosition);
                 if (isAuto) {
                     if (mMusicPosition < Constant.ALL_MUSIC_LIST.size() - 1) {
+                        Log.e("xulinchao11", "selectMusic: ALL_MUSIC_LIST = " + Constant.ALL_MUSIC_LIST.size());
                         mMusicPosition = mMusicPosition + 1;
                         musicDesInfo = Constant.ALL_MUSIC_LIST.get(mMusicPosition);
                         playMusic(musicDesInfo.getUrl());

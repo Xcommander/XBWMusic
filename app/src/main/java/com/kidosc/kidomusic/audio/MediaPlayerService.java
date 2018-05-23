@@ -414,8 +414,8 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
                     }
 
                     state = AudioPlayerConst.PlayerState.PAUSE;
-                    startAfterPrepare = true;
-                    preparePlayer();
+//                    startAfterPrepare = true;
+//                    preparePlayer();
                 }
             });
         }
