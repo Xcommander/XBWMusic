@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import static android.content.Context.BIND_AUTO_CREATE;
@@ -19,7 +20,8 @@ public class DownloadUtil {
      */
     private static DownloadUtil mInstance;
     private Application mApp;
-    private DownloadService.DownLoadBinder mDownloadBinder;
+    private DownloadService.DownLoadBinder mDownloadBinder=null;
+
     /**
      * ServiceConnection实例
      */
@@ -83,10 +85,6 @@ public class DownloadUtil {
      * @return
      */
     public DownloadService.DownLoadBinder getmDownloadBinder() {
-        while (mDownloadBinder == null) {
-            //等待初始化，此log不能去掉，可以起到延时，防止一切都初始化失败
-            Log.e("xulinchao", "getmDownloadBinder: wait" );
-        }
         return mDownloadBinder;
     }
 }

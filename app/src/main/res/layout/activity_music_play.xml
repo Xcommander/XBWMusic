@@ -6,15 +6,18 @@
     android:layout_height="match_parent"
     android:background="@drawable/music_play_bg"
     android:orientation="vertical"
+    android:id="@+id/music_background"
     tools:context=".activity.MusicPlayActivity">
 
 
     <!--标题栏-->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="45px"
+        android:background="@drawable/music_title_bar">
 
         <TextView
+            android:id="@+id/music_title_name"
             android:layout_width="wrap_content"
             android:layout_height="40px"
             android:layout_marginLeft="10px"
@@ -37,201 +40,121 @@
 
     </RelativeLayout>
 
-    <!--详情-->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10px"
-        android:layout_marginTop="9px">
+        android:layout_height="match_parent">
 
+        <android.support.v4.view.ViewPager
+            android:id="@+id/music_info"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
+        <!--小圆点导航栏-->
         <LinearLayout
-            android:layout_width="153px"
+            android:id="@+id/circle_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="20px"
+            android:layout_marginTop="178px"
+            android:gravity="center"
+            android:orientation="horizontal" />
+        <!--进度条-->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginTop="202px"
+            android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="65px"
-                android:layout_height="59px"
-                android:layout_marginStart="29px"
-                android:src="@drawable/album" />
-            <!--专辑信息-->
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="30px"
-                android:layout_marginTop="6px">
+            <TextView
+                android:id="@+id/music_duration_played"
+                android:layout_width="0dp"
+                android:layout_height="25px"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:paddingLeft="8px"
+                android:paddingTop="0px"
+                android:text="00:00"
+                android:textColor="@android:color/white"
+                android:textSize="17px" />
 
-                <ImageView
-                    android:id="@+id/ic_genre"
-                    android:layout_width="30px"
-                    android:layout_height="30px"
-                    android:src="@drawable/ic_genre" />
+            <SeekBar
+                android:id="@+id/play_seek"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:background="@null"
+                android:maxHeight="5dp"
+                android:minHeight="5dp"
+                android:paddingEnd="0dp"
+                android:paddingStart="0dp"
+                android:progressDrawable="@drawable/play_seekbar"
+                android:secondaryProgress="1"
+                android:splitTrack="false"
+                android:thumb="@drawable/seek_thumb"
+                android:thumbOffset="0dp" />
 
-                <TextView
-                    android:id="@+id/genre"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/ic_genre"
-                    android:paddingBottom="3px"
-                    android:paddingLeft="3px"
-                    android:text="unknown"
-                    android:textSize="20px" />
-            </RelativeLayout>
-            <!--歌手信息-->
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="30px"
-                android:layout_marginTop="6px">
+            <TextView
+                android:id="@+id/music_duration"
+                android:layout_width="0dp"
+                android:layout_height="25px"
+                android:layout_marginLeft="8px"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:paddingTop="0px"
+                android:text="00:00"
+                android:textColor="@android:color/white"
+                android:textSize="17px" />
 
-                <ImageView
-                    android:id="@+id/ic_singer"
-                    android:layout_width="30px"
-                    android:layout_height="30px"
-                    android:src="@drawable/ic_singer" />
+        </LinearLayout>
+        <!--按钮状态栏-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44px"
+            android:layout_marginTop="231px"
+            android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/singer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/ic_singer"
-                    android:paddingBottom="3px"
-                    android:paddingLeft="3px"
-                    android:text="周杰伦"
-                    android:textSize="20px" />
-            </RelativeLayout>
+            <Button
+                android:id="@+id/btn_vol"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/btn_music_volume"
+                android:onClick="musicClick" />
+
+            <Button
+                android:id="@+id/btn_fb"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/btn_music_fb"
+                android:onClick="musicClick" />
+
+            <Button
+                android:id="@+id/btn_play"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/btn_play"
+                android:onClick="musicClick" />
+
+            <Button
+                android:id="@+id/btn_ff"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/btn_music_ff"
+                android:onClick="musicClick" />
+
+            <Button
+                android:id="@+id/btn_sequence"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/btn_music_order"
+                android:onClick="musicClick" />
+
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="141px"
-            android:layout_height="113px"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="153px"
-            android:src="@drawable/audio_bg" />
     </RelativeLayout>
-    <!--歌曲信息-->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6px">
-
-        <ImageView
-            android:id="@+id/ic_lrc"
-            android:layout_width="30px"
-            android:layout_height="30px"
-            android:layout_marginLeft="10px"
-            android:src="@drawable/ic_lrc" />
-
-        <TextView
-            android:id="@+id/music_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/ic_lrc"
-            android:includeFontPadding="false"
-            android:paddingBottom="1px"
-            android:paddingLeft="3px"
-            android:paddingTop="2px"
-            android:text="青花瓷"
-            android:textSize="20px" />
-
-        <TextView
-            android:id="@+id/bit_rate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
-            android:includeFontPadding="false"
-            android:paddingBottom="1px"
-            android:paddingTop="2px"
-            android:textSize="20px" />
-
-    </RelativeLayout>
-    <!--进度条-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14px"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/music_duration_played"
-            android:layout_width="58px"
-            android:layout_height="25px"
-            android:includeFontPadding="false"
-            android:paddingLeft="8px"
-            android:paddingTop="7px"
-            android:text="00:00"
-            android:textColor="@android:color/background_dark"
-            android:textSize="17px" />
-
-        <SeekBar
-            android:id="@+id/play_seek"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="210px"
-            android:layout_height="wrap_content"
-            android:maxHeight="8dp"
-            android:minHeight="8dp"
-            android:paddingEnd="0dp"
-            android:paddingStart="0dp"
-            android:progressDrawable="@drawable/play_seekbar"
-            android:secondaryProgress="0"
-            android:thumb="@drawable/seek_thumb"
-            android:thumbOffset="0dp" />
-
-        <TextView
-            android:id="@+id/music_duration"
-            android:layout_width="63px"
-            android:layout_height="25px"
-            android:layout_marginLeft="8px"
-            android:includeFontPadding="false"
-            android:paddingTop="7px"
-            android:text="00:00"
-            android:textColor="@android:color/background_dark"
-            android:textSize="17px" />
-
-    </LinearLayout>
-
-
-    <!--各种按钮-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="39px"
-        android:layout_marginTop="16px"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_fb"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/btn_fb"
-            android:onClick="musicClick" />
-
-        <Button
-            android:id="@+id/btn_play"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/btn_play"
-            android:onClick="musicClick" />
-
-        <Button
-            android:id="@+id/btn_ff"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/btn_ff"
-            android:onClick="musicClick" />
-
-        <Button
-            android:id="@+id/btn_random"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/btn_random"
-            android:onClick="musicClick" />
-
-    </LinearLayout>
-
 
 </LinearLayout>

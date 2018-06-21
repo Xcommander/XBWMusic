@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -39,13 +40,7 @@ public class AudioUtils {
     public IAudioPlayer getPlayer (AudioType type) {
         switch (type) {
             case MEDIA:
-                while (mMediaPlayer==null){
-                    //等待初始化OK,这个仅仅做延时用
-                    Log.e(TAG, "getPlayer: wait ");
-                }
                 return mMediaPlayer;
-            case MPD:
-                return null;
             default:
                 return null;
         }
@@ -86,7 +81,12 @@ public class AudioUtils {
             mIsServiceConnection=false;
         }
     };
-    //获取当前的mediaservice的链接情况
+
+    /**
+     * 获取当前的media service的链接情况
+     *
+     * @return 连接success为true，连接fail为false
+     */
     public boolean getServiceConnecion(){
         return mIsServiceConnection;
     }

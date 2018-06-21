@@ -26,6 +26,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("xulinchao", "onCreate: ");
         application = this;
 
     }

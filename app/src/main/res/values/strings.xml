@@ -6,4 +6,9 @@
     <string name="cycle_all">全部循环</string>
     <string name="random">随机播放</string>
     <string name="volume">音量</string>
+    <string name="singer">演唱:</string>
+    <string name="arranger">编曲:</string>
+    <string name="album">专辑:</string>
+    <string name="release_time">发行时间:</string>
+    <string name="genre">歌曲流派:</string>
 </resources>

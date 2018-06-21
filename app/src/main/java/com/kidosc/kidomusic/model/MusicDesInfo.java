@@ -19,7 +19,7 @@ public class MusicDesInfo {
     /**
      * 专辑ID
      */
-    private long albumId;
+    private int albumId;
     /**
      * 显示名称
      */
@@ -49,12 +49,27 @@ public class MusicDesInfo {
      */
     private String lrcSize;
 
+    /**
+     * 发行时间
+     */
+    private String year;
+    /**
+     * 流派
+     */
+    private String genre;
+
+    /**
+     * 专辑图片
+     */
+    private String image;
+
+
     public MusicDesInfo() {
         super();
 
     }
 
-    public MusicDesInfo(long id, String title, String album, long albumId, String displayName, String artist, long duration, long size, String url, String lrcTitle, String lrcSize) {
+    public MusicDesInfo(long id, String title, String album, int albumId, String displayName, String artist, long duration, long size, String url, String lrcTitle, String lrcSize) {
         this.id = id;
         this.title = title;
         this.album = album;
@@ -92,11 +107,11 @@ public class MusicDesInfo {
         this.album = album;
     }
 
-    public long getAlbumId() {
+    public int getAlbumId() {
         return albumId;
     }
 
-    public void setAlbumId(long albumId) {
+    public void setAlbumId(int albumId) {
         this.albumId = albumId;
     }
 
@@ -155,4 +170,27 @@ public class MusicDesInfo {
     public void setLrcSize(String lrcSize) {
         this.lrcSize = lrcSize;
     }
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
 }

@@ -3,12 +3,21 @@ package com.kidosc.kidomusic.util;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -43,6 +52,7 @@ public class MusicUtil {
     /**
      * 将json数据转化成object
      */
+    @Nullable
     public static MusicInfo handleMusicResponse(final String data) {
         try {
             JSONObject jsonObject = new JSONObject(data);
@@ -76,6 +86,7 @@ public class MusicUtil {
      * @return
      */
 
+    @NonNull
     public static String formatTime(long time) {
         String min = time / (1000 * 60) + "";
         String sec = time % (1000 * 60) + "";
@@ -104,51 +115,31 @@ public class MusicUtil {
      */
     public static int getMusicVolume(int volume, String type) {
         if (Constant.VOULME_UP.equals(type)) {
-            if (volume < 1) {
-                volume = 1;
-            } else if (volume < 3) {
+            if (volume < 3) {
                 volume = 3;
-            } else if (volume < 5) {
-                volume = 5;
-            } else if (volume < 7) {
-                volume = 7;
+            } else if (volume < 6) {
+                volume = 6;
             } else if (volume < 9) {
                 volume = 9;
-            } else if (volume < 10) {
-                volume = 10;
-            } else if (volume < 11) {
-                volume = 11;
-            } else if (volume < 13) {
-                volume = 13;
+            } else if (volume < 12) {
+                volume = 12;
             } else if (volume <= 15) {
                 volume = 15;
             }
 
         } else {
-            if (volume <= 1) {
+            if (volume <= 3) {
                 volume = 0;
-            } else if (volume <= 3) {
-                volume = 1;
-            } else if (volume <= 5) {
+            } else if (volume <= 6) {
                 volume = 3;
-            } else if (volume <= 7) {
-                volume = 5;
-
             } else if (volume <= 9) {
-                volume = 7;
-            } else if (volume <= 10) {
+                volume = 6;
+            } else if (volume <= 12) {
                 volume = 9;
-
-            } else if (volume <= 11) {
-                volume = 10;
-
-            } else if (volume <= 13) {
-                volume = 11;
-
             } else if (volume <= 15) {
-                volume = 13;
-            }
+                volume = 12;
 
+            }
 
         }
 
@@ -164,37 +155,25 @@ public class MusicUtil {
      */
 
     public static Drawable getVolumePic(int volume) {
-        Drawable drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_0);
+        Drawable drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_01);
         switch (volume) {
             case 0:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_0);
-                break;
-            case 1:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_1);
+                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_01);
                 break;
             case 3:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_2);
+                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_02);
                 break;
-            case 5:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_3);
-                break;
-            case 7:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_4);
+            case 6:
+                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_03);
                 break;
             case 9:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_5);
+                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_04);
                 break;
-            case 10:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_6);
-                break;
-            case 11:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_7);
-                break;
-            case 13:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_8);
+            case 12:
+                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_05);
                 break;
             case 15:
-                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_9);
+                drawable = MyApplication.getApplication().getDrawable(R.drawable.ic_vol_06);
                 break;
             default:
                 //do nothing
@@ -244,7 +223,7 @@ public class MusicUtil {
                     .getColumnIndex(MediaStore.Audio.Media.ALBUM));
             String displayName = cursor.getString(cursor
                     .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-            long albumId = cursor.getInt(cursor
+            int albumId = cursor.getInt(cursor
                     .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
             // 时长
             long duration = cursor.getLong(cursor
@@ -255,26 +234,122 @@ public class MusicUtil {
             // 文件路径
             String url = cursor.getString(cursor
                     .getColumnIndex(MediaStore.Audio.Media.DATA));
+            //发行时间
+            String year = cursor.getString(cursor
+                    .getColumnIndex(MediaStore.Audio.Media.YEAR));
+            //流派
+            String genre = getGenre(id);
             // 是否为音乐
             int isMusic = cursor.getInt(cursor
                     .getColumnIndex(MediaStore.Audio.Media.IS_MUSIC));
-            Log.e("xulinchao22", "getMuiscInfos: _id = "+id );
             if (isMusic != 0) {
                 // 只把音乐添加到集合当中
                 MusicDesInfo musicDesInfo = new MusicDesInfo();
                 musicDesInfo.setTitle(title);
+                if ("<unknown>".equals(artist)) {
+                    artist = "未知音乐家";
+                }
                 musicDesInfo.setArtist(artist);
+                if ("Music".equals(album)) {
+                    album = "儿童歌曲";
+
+                }
                 musicDesInfo.setAlbum(album);
                 musicDesInfo.setDisplayName(displayName);
                 musicDesInfo.setAlbumId(albumId);
+                musicDesInfo.setImage(getAlbumImage(albumId));
                 musicDesInfo.setDuration(duration);
                 musicDesInfo.setSize(size);
                 musicDesInfo.setUrl(url);
+                if (year == null) {
+                    year = "未知年份";
+                }
+                musicDesInfo.setYear(year);
+                musicDesInfo.setGenre(genre);
                 musicDesInfos.add(musicDesInfo);
             }
         }
         cursor.close();
         return musicDesInfos;
+    }
+
+    /**
+     * 获取音乐的流派
+     *
+     * @param musicId
+     * @return
+     */
+    private static String getGenre(long musicId) {
+        Uri uri = Uri.parse("content://media/external/audio/media/" + musicId + "/genres");
+        Cursor c = MyApplication.getApplication().getContentResolver().query(uri, new String[]{android.provider.MediaStore.Audio.GenresColumns.NAME}, null, null, null);
+        if (c.moveToFirst()) {
+            String genre = c.getString(c.getColumnIndex(MediaStore.Audio.GenresColumns.NAME));
+            c.close();
+            if ("Other".equals(genre)) {
+                genre = "其他";
+            }
+            return genre;
+        }
+        return "未知流派";
+
+    }
+
+    /**
+     * 根据album id来获取专辑图片
+     *
+     * @param albumId
+     * @return 图片的路径
+     */
+    @Nullable
+    private static String getAlbumImage(int albumId) {
+        String result = "";
+        Cursor cursor = null;
+        try {
+            cursor = MyApplication.getApplication().getContentResolver().query(
+                    Uri.parse("content://media/external/audio/albums/"
+                            + albumId), new String[]{"album_art"}, null,
+                    null, null);
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); ) {
+                result = cursor.getString(0);
+                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null != cursor) {
+                cursor.close();
+            }
+        }
+        return null == result ? null : result;
+    }
+
+    /**
+     * 裁剪bitmap，以矩形形式裁剪
+     *
+     * @param bitmap
+     * @return
+     */
+
+    public static Bitmap getOvalBitmap(@NonNull Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
+                .getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        final RectF rectF = new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+
+        canvas.drawOval(rectF, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        return output;
     }
 
     /**
@@ -296,7 +371,6 @@ public class MusicUtil {
     public static void saveToJson(String spName, String name, ArrayList<DownloadModel> arrayList) {
         SharedPreferences.Editor editor = MyApplication.getApplication().getSharedPreferences(spName, MODE_PRIVATE).edit();
         String json = (new Gson()).toJson(arrayList);
-        Log.e("xulinchao", "saveToJson: " + json);
         editor.putString(name, json);
         editor.commit();
     }
@@ -317,7 +391,6 @@ public class MusicUtil {
             }.getType();
             models = (new Gson()).fromJson(json, type);
             if (models.size() != 0) {
-                Log.e("xulinchao", "jsonToList: ");
             }
 
         }
@@ -327,13 +400,13 @@ public class MusicUtil {
 
     /**
      * 判断当前的网络状况
+     *
      * @return
      */
     public static boolean isNetWorkOK() {
         try {
             ConnectivityManager connectivityManager = (ConnectivityManager) MyApplication.getApplication().getSystemService(CONNECTIVITY_SERVICE);
             NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
-            Log.e("xulinchao22", "isNetWorkOK: " + networkCapabilities.toString());
             return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
         } catch (Exception e) {
             e.printStackTrace();

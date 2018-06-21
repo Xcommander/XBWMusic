@@ -1,12 +1,14 @@
 package com.kidosc.kidomusic.activity;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -25,6 +27,9 @@ import com.kidosc.kidomusic.widget.MyRecyclerView;
 import java.io.File;
 import java.util.ArrayList;
 
+import static com.kidosc.kidomusic.activity.MyApplication.getAudioUtils;
+import static com.kidosc.kidomusic.activity.MyApplication.getDownloadUtil;
+
 
 public class MainActivity extends Activity {
     private MyRecyclerView mMusicListView;
@@ -32,7 +37,46 @@ public class MainActivity extends Activity {
     private MusicListAdapter musicListAdapter;
     private ProgressDialog mProgressDialog;
     private TextView mEmptyView;
+    /**
+     * 拦截相关广播事件
+     */
+    BroadcastReceiver eventBR = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("xulinchao", "intent.getAction():" + intent.getAction());
+            if (intent.getAction().equals("com.zeusis.myevents")) {
+                boolean isInCall = false;
+                ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                if (null != am.getRunningTasks(1) && !am.getRunningTasks(1).isEmpty()) {
+                    String activityName = am.getRunningTasks(1).get(0).topActivity.getClassName();
+                    isInCall = activityName.equals("com.zeusis.csp.activity.InCallActivity") || activityName.equals("com.zeusis.csp.activity.SecondInCallActivity");
+                }
+                Log.i("xulinchao", "isInCall:" + isInCall);
+                if (isInCall) {
+                    return;
+                }
+                if (getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA) == null) return;
+                if (getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).isPlaying()) {
+                    getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).playOrPause();
+                    Log.i("xulinchao", "mediaplayer--stop");
+                }
+            } else if (intent.getAction().equals("com.zeusis.socket.ban_launcher")) {
+                boolean flag = intent.getBooleanExtra("enable", false);
+                if (flag) {
+                    if (getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA) == null) return;
+                    if (getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).isPlaying()) {
+                        getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).playOrPause();
+                        Log.i("xulinchao", "mediaplayer--stop");
+                    }
+                }
+            } else if ("com.zeusis.csp.NEW_CHAT".equals(intent.getAction())) {
+                if (getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA) != null && getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).isPlaying()) {
+                    getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).playOrPause();
+                }
+            }
 
+        }
+    };
 
     /**
      * 广播:拦截当下载完成后，回调函数仍然是其他的监听函数，导致无法刷新界面
@@ -83,14 +127,6 @@ public class MainActivity extends Activity {
         if (!file.exists()) {
             file.mkdirs();
         }
-        MusicUtil.handleThread(new Runnable() {
-            @Override
-            public void run() {
-                if (MyApplication.getDownloadUtil().getmDownloadBinder().getmDownloadUpdate() != null) {
-                    MyApplication.getDownloadUtil().getmDownloadBinder().setmDownloadUpdate(mDownloadUpdate);
-                }
-            }
-        });
         mEmptyView = findViewById(R.id.empty_tv);
         mMusicListView = findViewById(R.id.music_list);
         mManager = new LinearLayoutManager(this);
@@ -108,7 +144,35 @@ public class MainActivity extends Activity {
         registerReceiver(mUpdateListReceiver, intentFilter);
 
         loadMusicList();
-        loadDownloadTask();
+
+        MusicUtil.handleThread(new Runnable() {
+            @Override
+            public void run() {
+                /**
+                 *首次获取的保护
+                 */
+                if (getDownloadUtil().getmDownloadBinder() == null) {
+                    int i = 0;
+                    while (getDownloadUtil().getmDownloadBinder() == null) {
+                        if (i < 15) {
+                            SystemClock.sleep(100);
+                            i++;
+                        } else {
+                            Log.d("xulinchao", "launch download service fail");
+                            return;
+                        }
+
+                    }
+
+                }
+                if (getDownloadUtil().getmDownloadBinder().getmDownloadUpdate() != null) {
+                    getDownloadUtil().getmDownloadBinder().setmDownloadUpdate(mDownloadUpdate);
+                    loadDownloadTask();
+                }
+            }
+        });
+        registerBR();
+
     }
 
     /**
@@ -129,6 +193,24 @@ public class MainActivity extends Activity {
                 });
             }
         });
+    }
+
+    /**
+     * 动态注册广播
+     */
+    private void registerBR() {
+        IntentFilter eventFilter = new IntentFilter();
+        eventFilter.addAction("com.zeusis.myevents");
+        eventFilter.addAction("com.zeusis.socket.ban_launcher");
+        eventFilter.addAction("com.zeusis.csp.NEW_CHAT");
+        registerReceiver(eventBR, eventFilter);
+    }
+
+    /**
+     * 解绑
+     */
+    private void unRegisterBR() {
+        unregisterReceiver(eventBR);
     }
 
     /**
@@ -166,13 +248,13 @@ public class MainActivity extends Activity {
                     ArrayList<DownloadModel> resourceFailedList = MusicUtil.jsonToList(Constant.SP_NAME_RESOURCE_FAILED, Constant.KEY_RESOURCE_FAILED);
                     if (networkFailedList != null && networkFailedList.size() > 0) {
                         for (int i = 0; i < networkFailedList.size(); i++) {
-                            MyApplication.getDownloadUtil().getmDownloadBinder().downloadTask(networkFailedList.get(i));
+                            getDownloadUtil().getmDownloadBinder().downloadTask(networkFailedList.get(i));
                         }
                         networkFailedList.clear();
                     }
                     if (resourceFailedList != null && resourceFailedList.size() > 0) {
                         for (int i = 0; i < resourceFailedList.size(); i++) {
-                            MyApplication.getDownloadUtil().getmDownloadBinder().downloadTask(resourceFailedList.get(i));
+                            getDownloadUtil().getmDownloadBinder().downloadTask(resourceFailedList.get(i));
                         }
                         resourceFailedList.clear();
 
@@ -192,8 +274,8 @@ public class MainActivity extends Activity {
         MusicUtil.handleThread(new Runnable() {
             @Override
             public void run() {
-                if (MyApplication.getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA) != null) {
-                    MyApplication.getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).stop();
+                if (getAudioUtils().getServiceConnecion()) {
+                    getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).stop();
                 }
             }
         });
@@ -202,9 +284,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unRegisterBR();
         unregisterReceiver(mUpdateListReceiver);
-        if (MyApplication.getAudioUtils() != null) {
-            MyApplication.getAudioUtils().release();
+        if (getAudioUtils() != null) {
+            getAudioUtils().release();
         }
 
     }

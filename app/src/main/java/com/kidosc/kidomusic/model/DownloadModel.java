@@ -6,6 +6,16 @@ package com.kidosc.kidomusic.model;
 public class DownloadModel {
     private String downloadUrl;
     private String Oid;
+
+    public String getLrcUrl() {
+        return lrcUrl;
+    }
+
+    public void setLrcUrl(String lrcUrl) {
+        this.lrcUrl = lrcUrl;
+    }
+
+    private String lrcUrl;
     public int count = 0;
 
     public String getDownloadUrl() {

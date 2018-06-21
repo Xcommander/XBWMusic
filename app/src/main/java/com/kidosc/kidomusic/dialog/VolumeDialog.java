@@ -52,8 +52,10 @@ public class VolumeDialog extends DialogFragment {
     public void onStart() {
         super.onStart();
         //设置大小以及禁止消失
+//        getDialog().getWindow().setLayout(
+//                (int) (getResources().getDisplayMetrics().widthPixels * 0.7f), (int) (getResources().getDisplayMetrics().heightPixels * 0.41f));
         getDialog().getWindow().setLayout(
-                (int) (getResources().getDisplayMetrics().widthPixels * 0.7f), (int) (getResources().getDisplayMetrics().heightPixels * 0.41f));
+               266, 149);
         getDialog().setCancelable(false);
         getDialog().setCanceledOnTouchOutside(false);
 
@@ -80,8 +82,8 @@ public class VolumeDialog extends DialogFragment {
         mVolumePic.setImageDrawable(MusicUtil.getVolumePic(vol));
         //设置坐标位置
         WindowManager.LayoutParams layoutParams = getDialog().getWindow().getAttributes();
-        layoutParams.x = 53;
-        layoutParams.y = 95;
+        layoutParams.x = 27;
+        layoutParams.y = 82;
         getDialog().getWindow().setAttributes(layoutParams);
         getDialog().setOnKeyListener(mOnKeyListener);
         return view;

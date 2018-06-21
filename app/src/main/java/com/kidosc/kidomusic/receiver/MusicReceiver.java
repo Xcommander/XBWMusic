@@ -3,6 +3,7 @@ package com.kidosc.kidomusic.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.kidosc.kidomusic.activity.MyApplication;
@@ -13,6 +14,8 @@ import com.kidosc.kidomusic.util.Constant;
 import com.kidosc.kidomusic.util.MusicUtil;
 
 import java.io.File;
+
+import static com.kidosc.kidomusic.activity.MyApplication.getDownloadUtil;
 
 
 /**
@@ -55,14 +58,34 @@ public class MusicReceiver extends BroadcastReceiver {
                     @Override
                     public void run() {
                         MusicInfo musicInfo = MusicUtil.handleMusicResponse(content);
-                        if (MyApplication.getDownloadUtil().getmDownloadBinder().getmDownloadUpdate() == null) {
-                            MyApplication.getDownloadUtil().getmDownloadBinder().setmDownloadUpdate(mDownloadUpdate);
+
+                        /**
+                         *首次获取的保护
+                         */
+                        if(getDownloadUtil().getmDownloadBinder()==null) {
+                            int i =0;
+                            while(getDownloadUtil().getmDownloadBinder()==null){
+                                if(i<15){
+                                    SystemClock.sleep(100);
+                                    i++;
+                                }else{
+                                    Log.d("MediaPlayerService", "get player error ");
+                                    return;
+                                }
+
+                            }
+
+                        }
+                        if (getDownloadUtil().getmDownloadBinder().getmDownloadUpdate() == null) {
+                            getDownloadUtil().getmDownloadBinder().setmDownloadUpdate(mDownloadUpdate);
                         }
                         DownloadModel model=new DownloadModel();
                         model.setDownloadUrl(Constant.MUSIC_ONLINE_URL
                                 + musicInfo.path.split("/")[1]);
                         model.setOid(Oid);
-                        MyApplication.getDownloadUtil().getmDownloadBinder().downloadTask(model);
+                        model.setLrcUrl(Constant.MUSIC_ONLINE_URL
+                                + (musicInfo.path.split("/")[1]).replace(".mp3",".lrc"));
+                        getDownloadUtil().getmDownloadBinder().downloadTask(model);
                     }
                 });
 

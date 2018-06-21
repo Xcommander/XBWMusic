@@ -33,9 +33,15 @@ public class DownloadService extends Service {
      */
     private ArrayList<DownloadModel> mDownloadList = new ArrayList<>();
     /**
-     * 下载的task
+     * 下载MP3的task
      */
     private DownloadTask mDownloadTask;
+
+    /**
+     * 下载歌词的task
+     */
+    private DownloadTask mLrcTask;
+
 
     /**
      * 下载对象
@@ -51,7 +57,7 @@ public class DownloadService extends Service {
      */
     private ArrayList<DownloadModel> mResourceDownloadFailedList = new ArrayList<>();
     /**
-     * 下载的监听函数
+     * 下载mp3的监听函数
      */
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
@@ -162,6 +168,38 @@ public class DownloadService extends Service {
         }
     };
 
+    /**
+     * 下载歌词的监听函数
+     */
+    private DownloadListener mLrcListener = new DownloadListener() {
+        @Override
+        public void onProgress(int progress) {
+
+        }
+
+        @Override
+        public void onSuccess() {
+            Log.d("xulinchao", "onSuccess: " + mDownloadModel.getLrcUrl());
+
+        }
+
+        @Override
+        public void onFailed() {
+            Log.d("xulinchao", "onFailed: " + mDownloadModel.getLrcUrl());
+
+        }
+
+        @Override
+        public void onPaused() {
+
+        }
+
+        @Override
+        public void onCanceled() {
+
+        }
+    };
+
     private DownLoadBinder mDownloadBinder = new DownLoadBinder();
 
     @Override
@@ -243,8 +281,10 @@ public class DownloadService extends Service {
         private void startDownload(DownloadModel model) {
             if (mDownloadTask == null && model != null) {
                 mDownloadTask = new DownloadTask(mDownloadListener);
+                mLrcTask = new DownloadTask(mLrcListener);
                 mDownloadModel = model;
                 mDownloadTask.execute(mDownloadModel.getDownloadUrl());
+                mLrcTask.execute(mDownloadModel.getLrcUrl());
 
             }
         }

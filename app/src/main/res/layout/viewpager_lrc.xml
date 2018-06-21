@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:lrc="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="40px"
+    android:orientation="vertical">
+
+    <com.kidosc.kidomusic.widget.LrcView
+        android:id="@+id/music_lrc"
+        android:layout_width="match_parent"
+        android:layout_height="186px"
+        android:layout_marginBottom="5dp"
+        lrc:currentTextColor="@android:color/holo_green_dark"
+        lrc:dividerHeight="17px"
+        lrc:normalTextColor="@android:color/white"
+        lrc:rows="5"
+        lrc:textSize="20px" />
+
+
+</LinearLayout>
