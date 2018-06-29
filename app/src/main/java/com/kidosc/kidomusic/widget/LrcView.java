@@ -7,11 +7,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -22,7 +22,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
@@ -98,6 +97,12 @@ public class LrcView extends View {
     private Bitmap mBackground;
 
     private Scroller mScroller;
+
+    /**
+     * 总时间
+     */
+    private long mTotalTime;
+
 
 
     public static Pattern mPattern = Pattern.compile("\\[\\d.+\\].+");
@@ -196,6 +201,7 @@ public class LrcView extends View {
         currentX = Math.max(currentX, 0);
 
         canvas.drawText(currentLrc, currentX, centerY - mOffsetY, mCurrentPaint);
+
         int firstLine = mCurrentLine - mRows / 2;
         firstLine = firstLine <= 0 ? 0 : firstLine;
         int lastLine = mCurrentLine + mRows / 2 + 2;
@@ -297,12 +303,12 @@ public class LrcView extends View {
                 mNextTime = mTimes.get(i);
                 mScroller.abortAnimation();
                 mScroller.startScroll(i, 0, 0, mMaxScroll, SCROLL_TIME);
+
                 postInvalidate();
                 return;
             }
         }
     }
-
     public void onDrag(int progress) {
         for (int i = 0; i < mTimes.size(); i++) {
             if (Integer.parseInt(mTimes.get(i).toString()) > progress) {
@@ -379,7 +385,7 @@ public class LrcView extends View {
                 mLrcs.add(arr[1]);
             }
             if (mTimes.size() > 0) {
-                mTimes.add(2500000L);
+                mTimes.add(mTotalTime);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -417,6 +423,14 @@ public class LrcView extends View {
      */
     public void setBackground(Bitmap bmp) {
         mBackground = bmp;
+    }
+
+    /**
+     * 设置歌曲的总时间
+     * @param mTotalTime
+     */
+    public void setmTotalTime(long mTotalTime) {
+        this.mTotalTime = mTotalTime;
     }
 }
 

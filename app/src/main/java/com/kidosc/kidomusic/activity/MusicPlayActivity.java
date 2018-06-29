@@ -8,16 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
-import android.provider.SyncStateContract;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -41,8 +37,6 @@ import com.kidosc.kidomusic.widget.CircularSeekBar;
 import com.kidosc.kidomusic.widget.LrcView;
 import com.kidosc.kidomusic.widget.MyPopWindow;
 
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,6 +120,11 @@ public class MusicPlayActivity extends Activity implements ViewPager.OnPageChang
      */
     private AudioManager mAudioManager;
 
+    /**
+     * 音量状态按钮
+     */
+    private Button mVolumeState;
+
 
     /**
      * 通过handler来达到延时效果，从而让控件消失
@@ -208,7 +207,7 @@ public class MusicPlayActivity extends Activity implements ViewPager.OnPageChang
         @Override
         public void run() {
             if (mVolumeDialog.isVisible()) {
-                mVolumeDialog.dismiss();
+                mVolumeDialog.dismissAllowingStateLoss();
             }
 
         }
@@ -278,7 +277,7 @@ public class MusicPlayActivity extends Activity implements ViewPager.OnPageChang
         mSequenceButton.setBackground(getSequenceButtonDrawable());
         mPlaySeekBar = findViewById(R.id.play_seek);
         mProgress = findViewById(R.id.progress);
-
+        mVolumeState = findViewById(R.id.btn_vol);
         mMusicName = findViewById(R.id.music_title_name);
         mDuration = findViewById(R.id.music_duration);
         mDurationPlayed = findViewById(R.id.music_duration_played);
@@ -466,9 +465,11 @@ public class MusicPlayActivity extends Activity implements ViewPager.OnPageChang
                 if (isPlaying) {
                     mPlayButton.setBackgroundResource(R.drawable.btn_stop);
                     mAlbumImageView.playMusic(AnimationImageView.State.STATE_PLAYING);
+                    mVolumeState.setBackgroundResource(R.drawable.btn_music_volume);
                 } else {
                     mPlayButton.setBackgroundResource(R.drawable.btn_play);
                     mAlbumImageView.playMusic(AnimationImageView.State.STATE_PAUSE);
+                    mVolumeState.setBackgroundResource(R.drawable.btn_music_volume1);
                 }
             }
         });
@@ -500,15 +501,23 @@ public class MusicPlayActivity extends Activity implements ViewPager.OnPageChang
             mBackground.setBackgroundResource(R.drawable.music_play_bg);
             mAlbumImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_music_04, null));
         } else {
+
+            if (mCurrentViewPagerPosition == Constant.PAGE_ABLUM_INMAGE) {
+                mBackground.setBackgroundResource(R.drawable.music_play_bg);
+            } else {
+                mBackground.setBackground(new BitmapDrawable(getResources(), mBackgroundBitmap));
+            }
             Bitmap ovalBitmap = MusicUtil.getOvalBitmap(mBackgroundBitmap);
-            mBackground.setBackground(new BitmapDrawable(getResources(), mBackgroundBitmap));
             mAlbumImageView.setImageBitmap(ovalBitmap);
         }
+
+
         /**
          * 设置歌词路径
          */
 
         mLrcView.setLrcPath(Constant.MUSIC_DIR + "/" + musicDesInfo.getTitle() + ".lrc");
+        mLrcView.setmTotalTime(musicDesInfo.getDuration());
 
     }
 
@@ -710,7 +719,7 @@ public class MusicPlayActivity extends Activity implements ViewPager.OnPageChang
      *
      * @param type
      */
-    public void setVolume(String type) {
+    public void setVolume(final String type) {
 
         mHandler.removeCallbacks(volumeDialogRunable);
         mHandler.postDelayed(volumeDialogRunable, 2000);
@@ -720,9 +729,21 @@ public class MusicPlayActivity extends Activity implements ViewPager.OnPageChang
         } else {
             vol = MusicUtil.getMusicVolume(vol, Constant.VOULME_DOWN);
         }
-        //Dialog 中create view这个过程慢，导致变量还没有被赋值,空指针异常
+        //Dialog 中create view这个过程慢，导致变量还没有被赋值,空指针异常,所以50ms,进行新的尝试
         if (mVolumeDialog.mVolumePic == null) {
             Log.d("vol", "setVolume: ");
+            MusicUtil.handleThread(new Runnable() {
+                @Override
+                public void run() {
+                    SystemClock.sleep(50);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setVolume(type);
+                        }
+                    });
+                }
+            });
             return;
         }
         mVolumeDialog.mVolumePic.setImageDrawable(MusicUtil.getVolumePic(vol));

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.kidosc.kidomusic.activity.MyApplication;
 import com.kidosc.kidomusic.download.DownloadUpdate;
 import com.kidosc.kidomusic.gson.MusicInfo;
 import com.kidosc.kidomusic.model.DownloadModel;

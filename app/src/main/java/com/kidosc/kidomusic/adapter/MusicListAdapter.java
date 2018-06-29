@@ -14,15 +14,11 @@ import android.widget.TextView;
 
 import com.kidosc.kidomusic.R;
 import com.kidosc.kidomusic.activity.MusicPlayActivity;
-import com.kidosc.kidomusic.activity.MyApplication;
-import com.kidosc.kidomusic.audio.AudioUtils;
-import com.kidosc.kidomusic.gson.MusicInfo;
-import com.kidosc.kidomusic.model.MusicDesInfo;
-import com.kidosc.kidomusic.util.MusicUtil;
 
-import java.io.UnsupportedEncodingException;
+import com.kidosc.kidomusic.model.MusicDesInfo;
+
 import java.util.ArrayList;
-import java.util.List;
+
 
 /**
  * Created by jason.xu on 2018/4/25.

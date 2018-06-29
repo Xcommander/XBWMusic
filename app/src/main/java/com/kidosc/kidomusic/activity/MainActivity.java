@@ -292,10 +292,6 @@ public class MainActivity extends Activity {
 
     }
 
-    /**
-     * 1.设置监听广播，这样就可以知道是否有音乐的加入，从而刷新列表
-     * 2.当下载Ok的时候，通知系统去扫描指定位置，将音乐加入media相关存储
-     */
 
 
 }

@@ -327,11 +327,6 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    // 还原音量
-                   musicVolume=MusicUtil.getMusicVolume(musicVolume, Constant.VOULME_DOWN);
-                    Log.i(TAG, "22222===musicVolume:" + musicVolume + ",systemVolume:" + systemVolume);
-                    //FLAG_VIBRATE
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, musicVolume, AudioManager.FLAG_VIBRATE);
                     // 获得音频焦点
                     if (mIsPlaying) {
                         state = AudioPlayerConst.PlayerState.PLAYING;

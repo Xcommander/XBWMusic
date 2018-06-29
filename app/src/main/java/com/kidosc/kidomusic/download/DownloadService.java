@@ -2,8 +2,7 @@ package com.kidosc.kidomusic.download;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -13,14 +12,11 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.kidosc.kidomusic.activity.MyApplication;
 import com.kidosc.kidomusic.model.DownloadModel;
 import com.kidosc.kidomusic.util.Constant;
 import com.kidosc.kidomusic.util.MusicUtil;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jason.xu on 2018/5/9.

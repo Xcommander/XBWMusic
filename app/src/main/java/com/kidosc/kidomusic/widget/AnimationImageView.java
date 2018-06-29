@@ -63,7 +63,11 @@ public class AnimationImageView extends AppCompatImageView {
         } else if (mState == State.STATE_PAUSE) {
             mObjectAnimator.pause();
         } else if (mState == State.STATE_PLAYING) {
-            mObjectAnimator.start();
+            if (mObjectAnimator.isPaused()) {
+                mObjectAnimator.resume();
+            } else {
+                mObjectAnimator.start();
+            }
         }
     }
 
