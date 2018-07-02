@@ -99,11 +99,19 @@ public class LrcView extends View {
     private Scroller mScroller;
 
     /**
-     * 总时间
+     * 歌曲总时间
      */
     private long mTotalTime;
 
+    /**
+     * 控制歌词水平滚动的属性动画
+     */
+    private ValueAnimator mAnimator;
 
+    /**
+     * 歌词过长的时候x轴绘制坐标
+     */
+    private float mCurTextXForHighLightLrc;
 
     public static Pattern mPattern = Pattern.compile("\\[\\d.+\\].+");
 
@@ -192,16 +200,18 @@ public class LrcView extends View {
             mCurrentPaint.setColor(Color.parseColor("#f29112"));
             return;
         }
-        if(mNextTime<=mTimes.get(1)){
-            mOffsetY=0;
+        if (mNextTime <= mTimes.get(1)) {
+            mOffsetY = 0;
         }
         float offsetY = mTextBounds.height() + mDividerHeight;
         String currentLrc = mLrcs.get(mCurrentLine);
         float currentX = (mViewWidth - mCurrentPaint.measureText(currentLrc)) / 2;
         currentX = Math.max(currentX, 0);
-
-        canvas.drawText(currentLrc, currentX, centerY - mOffsetY, mCurrentPaint);
-
+        if (mCurrentPaint.measureText(currentLrc) > mViewWidth) {
+            canvas.drawText(currentLrc, mCurTextXForHighLightLrc, centerY - mOffsetY, mCurrentPaint);
+        } else {
+            canvas.drawText(currentLrc, currentX, centerY - mOffsetY, mCurrentPaint);
+        }
         int firstLine = mCurrentLine - mRows / 2;
         firstLine = firstLine <= 0 ? 0 : firstLine;
         int lastLine = mCurrentLine + mRows / 2 + 2;
@@ -234,6 +244,16 @@ public class LrcView extends View {
                 int cur = mScroller.getCurrX();
                 mCurrentLine = cur <= 1 ? 0 : cur - 1;
                 mOffsetY = 0;
+                /**
+                 * 判断歌词长度是否过长，过长则滚动显示，还有一种是分行显示，但是有些问题，后续再考虑
+                 */
+                if (mViewWidth > 0 && mCurrentPaint.measureText(mLrcs.get(mCurrentLine)) > mViewWidth) {
+                    if (mCurrentLine < mLrcs.size() - 1) {
+                        startScrollLrc(mViewWidth - mCurrentPaint.measureText(mLrcs.get(mCurrentLine)), (long) ((mTimes.get(mCurrentLine + 1) - mTimes.get(mCurrentLine)) * 0.6));
+                    } else if (mCurrentLine == mLrcs.size() - 1) {
+                        startScrollLrc(mViewWidth - mCurrentPaint.measureText(mLrcs.get(mCurrentLine)), (long) ((mTotalTime - mTimes.get(mCurrentLine)) * 0.6));
+                    }
+                }
             }
             postInvalidate();
         }
@@ -303,13 +323,14 @@ public class LrcView extends View {
                 mNextTime = mTimes.get(i);
                 mScroller.abortAnimation();
                 mScroller.startScroll(i, 0, 0, mMaxScroll, SCROLL_TIME);
-
                 postInvalidate();
                 return;
             }
         }
     }
+
     public void onDrag(int progress) {
+        stopScrollLrc();
         for (int i = 0; i < mTimes.size(); i++) {
             if (Integer.parseInt(mTimes.get(i).toString()) > progress) {
                 mNextTime = i == 0 ? 0 : mTimes.get(i - 1);
@@ -385,7 +406,7 @@ public class LrcView extends View {
                 mLrcs.add(arr[1]);
             }
             if (mTimes.size() > 0) {
-                mTimes.add(mTotalTime);
+                mTimes.add(2500000L);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -425,12 +446,52 @@ public class LrcView extends View {
         mBackground = bmp;
     }
 
-    /**
-     * 设置歌曲的总时间
-     * @param mTotalTime
-     */
+
+    /************************************************歌词滚动***************************************************************/
     public void setmTotalTime(long mTotalTime) {
         this.mTotalTime = mTotalTime;
     }
+    /**
+     * 开始水平滚动歌词
+     *
+     * @param endX     歌词第一个字的最终的x坐标
+     * @param duration 滚动的持续时间
+     */
+    private void startScrollLrc(float endX, long duration) {
+        if (mAnimator == null) {
+            mAnimator = ValueAnimator.ofFloat(0, endX);
+            mAnimator.addUpdateListener(updateListener);
+        } else {
+            mCurTextXForHighLightLrc=0;
+            mAnimator.cancel();
+            mAnimator.setFloatValues(0, endX);
+        }
+        mAnimator.setDuration(duration);
+        mAnimator.setStartDelay((long) (duration * 0.2));
+        mAnimator.start();
+    }
+
+    /**
+     * 停止歌词的滚动
+     */
+    private void stopScrollLrc() {
+        if (mAnimator != null) {
+            mAnimator.cancel();
+        }
+        mCurTextXForHighLightLrc = 0;
+    }
+
+
+    /***
+     * 监听属性动画的数值值的改变
+     */
+    ValueAnimator.AnimatorUpdateListener updateListener = new ValueAnimator.AnimatorUpdateListener() {
+
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+            mCurTextXForHighLightLrc = (Float) animation.getAnimatedValue();
+            postInvalidate();
+        }
+    };
 }
 
